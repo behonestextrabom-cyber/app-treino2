@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Treino da semana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-2: #e4e9f1;
+  --ink: #0f1a2b;
+  --ink-soft: #4a5872;
+  --line: #d3dae6;
+  --accent: #2446f0;
+  --accent-ink: #ffffff;
+  --done: #0f7a55;
+  --done-bg: #dcf3ea;
+  --warn-bg: #fff1cf;
+  --warn-ink: #6b4a00;
+  --font-body: "Barlow", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Segoe UI", Roboto, Arial, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1420;
+    --surface: #16202f;
+    --surface-2: #223047;
+    --ink: #eef2f9;
+    --ink-soft: #9fb0cb;
+    --line: #2a3a54;
+    --accent: #6f8bff;
+    --accent-ink: #0d1420;
+    --done: #4fd6a3;
+    --done-bg: #143a2f;
+    --warn-bg: #3d3110;
+    --warn-ink: #ffd982;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1420;
+  --surface: #16202f;
+  --surface-2: #223047;
+  --ink: #eef2f9;
+  --ink-soft: #9fb0cb;
+  --line: #2a3a54;
+  --accent: #6f8bff;
+  --accent-ink: #0d1420;
+  --done: #4fd6a3;
+  --done-bg: #143a2f;
+  --warn-bg: #3d3110;
+  --warn-ink: #ffd982;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: inherit; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 140px; }
+
+header.top { padding: 20px 0 12px; }
+header.top h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: 0.2px;
+}
+header.top p { margin: 6px 0 0; color: var(--ink-soft); font-size: 15px; }
+
+nav.days {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  padding: 8px 0 10px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+nav.days button {
+  border: 2px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 8px 0 7px;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+nav.days .d { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; }
+nav.days .p { font-size: 12px; color: var(--ink-soft); line-height: 1; }
+nav.days button[aria-selected="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+nav.days button[aria-selected="true"] .p { color: var(--accent-ink); opacity: .85; }
+nav.days button.complete:not([aria-selected="true"]) { border-color: var(--done); }
+nav.days button.complete:not([aria-selected="true"]) .p { color: var(--done); font-weight: 600; }
+
+.day-head { margin: 14px 0 4px; }
+.day-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.05;
+}
+.day-head .meta { margin: 4px 0 0; color: var(--ink-soft); font-size: 15px; }
+
+.notice {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 12px 0 0;
+  font-size: 15px;
+}
+.tip { color: var(--ink-soft); font-size: 14px; margin: 12px 0 0; }
+
+details.warm {
+  margin: 14px 0 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+details.warm summary {
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+  cursor: pointer;
+}
+details.warm summary::-webkit-details-marker { display: none; }
+details.warm summary::after { content: "+"; font-family: var(--font-display); font-size: 28px; color: var(--ink-soft); line-height: 1; }
+details.warm[open] summary::after { content: "–"; }
+details.warm ul { margin: 0; padding: 0 16px 14px 34px; color: var(--ink); }
+details.warm li { padding: 3px 0; }
+details.warm li span { color: var(--ink-soft); }
+
+.list { margin: 14px 0 0; display: grid; gap: 12px; }
+.card {
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 14px 14px;
+}
+.card.done { border-color: var(--done); background: var(--done-bg); }
+.opts { display: flex; gap: 6px; margin: 0 0 10px; }
+.opts button {
+  flex: 1;
+  border: 2px solid var(--line);
+  background: var(--surface-2);
+  border-radius: 10px;
+  min-height: 40px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.opts button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.name { font-weight: 600; font-size: 19px; line-height: 1.2; margin: 0; }
+.rx {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.card.done .rx { color: var(--done); }
+.facts { margin: 8px 0 0; color: var(--ink-soft); font-size: 15px; display: grid; gap: 2px; }
+.facts b { color: var(--ink); font-weight: 600; }
+.prog {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 15px;
+}
+.note { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+.note.flag { color: var(--warn-ink); background: var(--warn-bg); padding: 8px 10px; border-radius: 10px; }
+.sets { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.sets button {
+  min-width: 56px;
+  min-height: 52px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  padding: 0 12px;
+}
+.sets button[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--bg); }
+.sets button.wide { min-width: 140px; font-family: var(--font-body); font-size: 16px; font-weight: 600; }
+
+.reset {
+  margin: 22px 0 0;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.timer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink);
+  color: var(--bg);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.timer.on { display: flex; }
+.timer .t { font-family: var(--font-display); font-weight: 700; font-size: 44px; line-height: 1; min-width: 110px; text-align: center; }
+.timer .l { font-size: 14px; opacity: .8; }
+.timer button {
+  border: 2px solid var(--bg);
+  background: transparent;
+  color: var(--bg);
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-weight: 600;
+}
+.timer.end { background: var(--done); color: #fff; }
+.timer.end button { border-color: #fff; color: #fff; }
+@media (prefers-reduced-motion: no-preference) {
+  .timer.end .t { animation: pulse 0.9s ease-in-out 3; }
+  @keyframes pulse { 50% { transform: scale(1.08); } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Treino da semana</h1>
+    <p>Série Março, foco em glúteo e posterior. Segunda a sexta.</p>
+  </header>
+  <nav class="days" id="days" role="tablist" aria-label="Dias da semana"></nav>
+  <main id="day"></main>
+</div>
+
+<div class="timer" id="timer" role="status" aria-live="polite">
+  <div>
+    <div class="t" id="tval">1:10</div>
+  </div>
+  <div class="l" id="tlabel">Descanso</div>
+  <button type="button" id="tskip">Pular</button>
+</div>
+
+<script>
+var DAYS = [
+  {
+    key: "seg", short: "Seg", title: "Glúteos e posterior",
+    warm: [
+      "Alongamento de quadríceps III <span>2 × 10 s</span>",
+      "Alongamento borboleta <span>2 × 10 s</span>",
+      "Alongamento de posteriores sentado, unilateral <span>2 × 10 s</span>",
+      "Ativação de glúteo com elevação pélvica <span>2 × 10</span>",
+      "Abdução deitada de lado, pernas flexionadas <span>2 × 10, com elástico (leve um se a academia não tiver)</span>"
+    ],
+    items: [
+      { opts: [{ name: "Elevação de quadril com barra", sets: 4, reps: "8–10", load: "Progressão por série",
+        prog: "25 kg, 30 kg, 40 kg, 50 kg (cada lado)", note: "Segure 10 segundos de isometria no final de cada série.", rest: 70 }] },
+      { opts: [{ name: "Búlgaro no Smith", sets: 3, reps: "10", load: "10 kg cada lado", rest: 70 }] },
+      { opts: [{ name: "Agachamento sumô na máquina", sets: 4, reps: "10", load: "Progressão por série",
+        prog: "20 kg, 30 kg, 40 kg, 50 kg (total)", note: "Sem a máquina, faça livre com steps.", rest: 70 }] },
+      { opts: [
+        { name: "Flexora unilateral", sets: 3, reps: "12", load: "12 kg cada lado", rest: 70 },
+        { name: "Stiff com pés afastados, barra livre", sets: 3, reps: "10", load: "20 kg cada lado", rest: 70 }
+      ] },
+      { opts: [{ name: "Panturrilha no agachamento articulado", sets: 4, reps: "10", load: "35 kg cada lado", rest: 70 }] }
+    ]
+  },
+  {
+    key: "ter", short: "Ter", title: "Costas e ombro",
+    warm: [
+      "Alongamento dorsal no espaldar (versões III ou VI) <span>séries não aparecem no vídeo</span>"
+    ],
+    items: [
+      { opts: [
+        { name: "Puxada aberta, barra reta", sets: 3, reps: "10", load: "5 barras", rest: 70 },
+        { name: "Puxada fechada, barra reta", sets: 3, reps: "8", load: "5 barras", rest: 70 }
+      ] },
+      { opts: [{ name: "Remada baixa, barra H", sets: 3, reps: "12", load: "5 barras", rest: 70 }] },
+      { opts: [{ name: "Pulldown, barra reta", sets: 4, reps: "10", load: "4 barras", rest: 70 }] },
+      { opts: [
+        { name: "Elevação lateral com halteres", sets: 3, reps: "12", load: "6 kg", rest: 70 },
+        { name: "Elevação frontal na polia com corda", sets: 3, reps: "8", load: "1 barra", rest: 70 }
+      ] },
+      { opts: [
+        { name: "Desenvolvimento com halteres sentado", sets: 3, reps: "10", load: "10 kg", rest: 70 },
+        { name: "Elevação frontal alternada", sets: 3, reps: "10", load: "5 kg", rest: 70 }
+      ] },
+      { opts: [
+        { name: "Abdominal infra, pernas flexionadas com elevação de quadril", sets: 4, reps: "12", load: "Segurando no espaldar", rest: 70 },
+        { name: "Abdominal prancha isométrica", sets: 4, reps: "1 min", load: "Sem carga", rest: 70 }
+      ] }
+    ]
+  },
+  {
+    key: "qua", short: "Qua", title: "Quadríceps",
+    warm: [
+      "Alongamento de quadríceps I <span>2 × 10 s</span>",
+      "Mobilidade de quadril II <span>2 × 10</span>",
+      "Mobilidade de tornozelo semi ajoelhado <span>2 × 10</span>"
+    ],
+    items: [
+      { opts: [{ name: "Agachamento livre com barra no suporte", sets: 4, reps: "10–12", load: "Progressão por série",
+        prog: "15 kg, 20 kg, 25 kg, 30 kg (cada lado)", rest: 70 }] },
+      { opts: [
+        { name: "Hack machine", sets: 3, reps: "10–12", load: "25 kg cada lado", rest: 70 },
+        { name: "Afundo com halteres entre steps", sets: 3, reps: "10 por perna", load: "8 kg cada halter", rest: 70 }
+      ] },
+      { opts: [{ name: "Leg press 45, pés afastados", sets: 3, reps: "10–12", load: "70 kg cada lado", rest: 70 }] },
+      { opts: [
+        { name: "Cadeira extensora", sets: 4, reps: "10 + máxima", load: "8 barras / 6 barras",
+          note: "A instrução completa aparece cortada no vídeo. Confira no app como dividir as duas cargas.", flag: true, rest: 70 },
+        { name: "Agachamento com halter à frente (calcanhar elevado)", sets: 4, reps: "10", load: "20 kg", rest: 70 }
+      ] },
+      { opts: [{ name: "Panturrilha no agachamento articulado", sets: 4, reps: "10", load: "30 kg cada lado", rest: 70 }] },
+      { opts: [{ name: "Escada máquina", sets: 1, reps: "20 min", load: "Velocidade 4,5", cardio: true, rest: 0 }] }
+    ]
+  },
+  {
+    key: "qui", short: "Qui", title: "Peito, tríceps e bíceps",
+    warm: [
+      "Mobilidade de ombro II <span>2 × 10 s</span>",
+      "Alongamento de peitoral no espaldar <span>2 × 20 s</span>"
+    ],
+    items: [
+      { opts: [{ name: "Supino máquina inclinado, pegada pronada", sets: 4, reps: "10", load: "12 kg cada lado", rest: 70 }] },
+      { opts: [
+        { name: "Supino inclinado com halteres", sets: 3, reps: "10", load: "8 kg cada halter", rest: 70 },
+        { name: "Crucifixo inclinado com halteres", sets: 3, reps: "12", load: "5 kg", rest: 70 }
+      ] },
+      { opts: [{ name: "Tríceps testa com barra W", sets: 3, reps: "12", load: "3 kg cada lado", rest: 70 }] },
+      { opts: [
+        { name: "Tríceps coice na polia", sets: 3, reps: "12", load: "2 barras", rest: 70 },
+        { name: "Rosca alternada com halteres", sets: 3, reps: "10", load: "6 kg", rest: 70 }
+      ] },
+      { opts: [{ name: "Rosca direta, barra W", sets: 3, reps: "12", load: "5 kg cada lado", rest: 70 }] },
+      { opts: [
+        { name: "Abdominal supra no solo", sets: 3, reps: "15", load: "Sem carga", rest: 70 },
+        { name: "Abdominal oblíquo alternado com pedalada", sets: 3, reps: "12", load: "Sem carga", rest: 70 }
+      ] },
+      { opts: [{ name: "Esteira sprint", sets: 1, reps: "30 min", load: "Intervalado", cardio: true, rest: 0,
+        note: "2 min na velocidade 6, 2 min na 8, 1 min na 10. Repita até completar 30 minutos." }] }
+    ]
+  },
+  {
+    key: "sex", short: "Sex", title: "Glúteos e posterior",
+    alert: "O vídeo termina no meio deste treino e o dia da semana dele não aparece. Coloquei na sexta por ser o quinto treino da série. Confira no app se há mais exercícios depois do levantamento terra.",
+    warm: [
+      "Alongamento de glúteos II",
+      "Alongamento de quadríceps III",
+      "Posterior de coxa <span>2 × 10</span>",
+      "Alongamento de posteriores no espaldar II"
+    ],
+    items: [
+      { opts: [{ name: "Subida no caixote com caneleira", sets: 3, reps: "10", load: "8 kg de caneleira", rest: 70 }] },
+      { opts: [
+        { name: "Glúteos coice na polia", sets: 3, reps: "8", load: "5 barras", rest: 70 },
+        { name: "Glúteos coice na polia, pernas estendidas", sets: 3, reps: "8", load: "4 barras", rest: 70 }
+      ] },
+      { opts: [{ name: "Levantamento terra sumô", sets: 4, reps: "8–10", load: "Carga não aparece no vídeo",
+        note: "Séries e repetições estão parciais. Confirme no app.", flag: true, rest: 70 }] }
+    ]
+  }
+];
+
+var STORE = "treino-semana-v1";
+var state = { day: 0, done: {}, pick: {} };
+var restoredDay = false;
+
+function load() {
+  try {
+    var raw = localStorage.getItem(STORE);
+    if (raw) {
+      var s = JSON.parse(raw);
+      if (s && typeof s === "object") {
+        state.done = s.done || {};
+        state.pick = s.pick || {};
+        if (typeof s.day === "number" && s.savedOn === todayStamp()) { state.day = s.day; restoredDay = true; }
+      }
+    }
+  } catch (e) {}
+}
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify({ done: state.done, pick: state.pick, day: state.day, savedOn: todayStamp() })); } catch (e) {}
+}
+function todayStamp() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+
+function dk(d, i) { return d + "|" + i; }
+function pickedOpt(d, i) {
+  var it = DAYS[d].items[i];
+  var p = state.pick[dk(d, i)] || 0;
+  return it.opts[p] ? p : 0;
+}
+function doneCount(d, i) { return state.done[dk(d, i)] || 0; }
+function itemDone(d, i) {
+  var o = DAYS[d].items[i].opts[pickedOpt(d, i)];
+  return doneCount(d, i) >= o.sets;
+}
+function dayProgress(d) {
+  var n = 0;
+  for (var i = 0; i < DAYS[d].items.length; i++) if (itemDone(d, i)) n++;
+  return n;
+}
+
+function renderNav() {
+  var html = "";
+  for (var d = 0; d < DAYS.length; d++) {
+    var total = DAYS[d].items.length, n = dayProgress(d);
+    var cls = n === total ? "complete" : "";
+    html += '<button type="button" role="tab" class="' + cls + '" data-day="' + d + '" aria-selected="' + (d === state.day) + '">' +
+      '<span class="d">' + DAYS[d].short + '</span><span class="p">' + (n === total ? "feito" : n + "/" + total) + '</span></button>';
+  }
+  document.getElementById("days").innerHTML = html;
+}
+
+function renderDay() {
+  var d = state.day, day = DAYS[d];
+  var n = dayProgress(d), total = day.items.length;
+  var h = '<div class="day-head"><h2>' + day.title + '</h2><p class="meta">' + n + ' de ' + total + ' exercícios feitos</p></div>';
+  if (day.alert) h += '<div class="notice">' + day.alert + '</div>';
+  h += '<p class="tip">Nos exercícios com opção A e B, escolha uma delas. O app do treino sugere alternar entre as duas de uma semana para a outra.</p>';
+  h += '<details class="warm"><summary>Aquecimento e mobilidade</summary><ul>';
+  for (var w = 0; w < day.warm.length; w++) h += '<li>' + day.warm[w] + '</li>';
+  h += '</ul></details><div class="list">';
+  for (var i = 0; i < day.items.length; i++) {
+    var it = day.items[i], p = pickedOpt(d, i), o = it.opts[p], c = doneCount(d, i);
+    var done = c >= o.sets;
+    h += '<section class="card' + (done ? ' done' : '') + '">';
+    if (it.opts.length > 1) {
+      h += '<div class="opts" role="group" aria-label="Escolha a opção">';
+      for (var k = 0; k < it.opts.length; k++)
+        h += '<button type="button" data-opt="' + i + ':' + k + '" aria-pressed="' + (k === p) + '">Opção ' + (k === 0 ? 'A' : 'B') + '</button>';
+      h += '</div>';
+    }
+    h += '<div class="row"><h3 class="name">' + o.name + '</h3><div class="rx">' + (o.cardio ? o.reps : o.sets + '×' + o.reps) + '</div></div>';
+    h += '<div class="facts"><div><b>Carga:</b> ' + o.load + '</div>' + (o.rest ? '<div><b>Descanso:</b> ' + o.rest + ' s</div>' : '') + '</div>';
+    if (o.prog) h += '<div class="prog">' + o.prog + '</div>';
+    if (o.note) h += '<p class="note' + (o.flag ? ' flag' : '') + '">' + o.note + '</p>';
+    if (it.note && !o.note) h += '<p class="note">' + it.note + '</p>';
+    h += '<div class="sets">';
+    if (o.sets === 1) {
+      h += '<button type="button" class="wide" data-set="' + i + ':0" aria-pressed="' + (c >= 1) + '">' + (c >= 1 ? 'Feito' : 'Marcar como feito') + '</button>';
+    } else {
+      for (var s = 0; s < o.sets; s++)
+        h += '<button type="button" data-set="' + i + ':' + s + '" aria-label="Série ' + (s + 1) + '" aria-pressed="' + (c > s) + '">' + (s + 1) + '</button>';
+    }
+    h += '</div></section>';
+  }
+  h += '</div><button type="button" class="reset" id="reset">Limpar marcações de ' + day.title.toLowerCase() + '</button>';
+  document.getElementById("day").innerHTML = h;
+}
+
+function render() { renderNav(); renderDay(); }
+
+document.getElementById("days").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-day]");
+  if (!b) return;
+  state.day = +b.getAttribute("data-day");
+  save(); render();
+  window.scrollTo(0, 0);
+});
+
+document.getElementById("day").addEventListener("click", function (e) {
+  var d = state.day;
+  var ob = e.target.closest("button[data-opt]");
+  if (ob) {
+    var a = ob.getAttribute("data-opt").split(":");
+    state.pick[dk(d, +a[0])] = +a[1];
+    delete state.done[dk(d, +a[0])];
+    save(); render(); return;
+  }
+  var sb = e.target.closest("button[data-set]");
+  if (sb) {
+    var b = sb.getAttribute("data-set").split(":"), i = +b[0], s = +b[1];
+    var o = DAYS[d].items[i].opts[pickedOpt(d, i)];
+    var c = doneCount(d, i);
+    var next = (c === s + 1) ? s : s + 1;
+    state.done[dk(d, i)] = next;
+    save(); render();
+    if (next > c && o.rest && next < o.sets) startTimer(o.rest);
+    else if (next > c && o.rest && next >= o.sets) stopTimer();
+    return;
+  }
+  if (e.target.id === "reset") {
+    for (var j = 0; j < DAYS[d].items.length; j++) { delete state.done[dk(d, j)]; delete state.pick[dk(d, j)]; }
+    save(); render(); stopTimer();
+  }
+});
+
+/* Cronômetro de descanso */
+var tBox = document.getElementById("timer"), tVal = document.getElementById("tval"), tLabel = document.getElementById("tlabel");
+var tEnd = 0, tInt = null;
+function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return m + ":" + (s < 10 ? "0" : "") + s; }
+function startTimer(sec) {
+  stopTimer();
+  tEnd = Date.now() + sec * 1000;
+  tBox.className = "timer on";
+  tLabel.textContent = "Descanso";
+  tVal.textContent = fmt(sec);
+  tInt = setInterval(tick, 250);
+}
+function tick() {
+  var left = Math.ceil((tEnd - Date.now()) / 1000);
+  if (left <= 0) {
+    clearInterval(tInt); tInt = null;
+    tVal.textContent = "0:00";
+    tLabel.textContent = "Próxima série";
+    tBox.className = "timer on end";
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+    return;
+  }
+  tVal.textContent = fmt(left);
+}
+function stopTimer() {
+  if (tInt) { clearInterval(tInt); tInt = null; }
+  tBox.className = "timer";
+}
+document.getElementById("tskip").addEventListener("click", stopTimer);
+
+/* Início: abre no dia de hoje (seg a sex) */
+load();
+(function () {
+  var g = new Date().getDay();
+  if (g >= 1 && g <= 5 && !restoredDay) state.day = g - 1;
+})();
+render();
+</script>
+</body>
+</html>
